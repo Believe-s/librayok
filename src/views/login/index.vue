@@ -49,8 +49,8 @@ export default {
     return {
       // 表单对应的对象
       loginForm: {
-        mobile: '',
-        code: ''
+        mobile: '18888888888',
+        code: '246810'
       },
       // 表单校验规则对象
       loginRules: {
@@ -84,6 +84,7 @@ export default {
               // 登陆成功后,做什么事情?
               // 1.跳转到首页
               // 2.保存登录状态
+              this.$router.push('/')
             })
             .catch(() => {
               // 提示错误  使用组件
