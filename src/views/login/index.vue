@@ -4,20 +4,21 @@
     <el-card class="login_box">
       <img src="../../assets/images/logo_index.png" alt />
       <!-- 表单 -->
-      <el-form>
-        <el-form-item>
-          <el-input placeholder="请输入内容"></el-input>
+      <el-form ref="loginForm" status-icon :model="loginForm" :rules="loginRules">
+        <el-form-item prop="mobile">
+          <el-input v-model="loginForm.mobile" placeholder="请输入手机号"></el-input>
+        </el-form-item>
+        <el-form-item prop="code">
+          <el-input v-model="loginForm.code" placeholder="请输入验证码" style="width:280px"></el-input>
+          <el-button type="primary" style="float:right">发送验证码</el-button>
         </el-form-item>
         <el-form-item>
-          <el-input placeholder="请输入验证码" style="width:280px"></el-input>
-          <el-button type="primary" style="float:right">主要按钮</el-button>
+          <el-checkbox v-model="checked"></el-checkbox>我已阅读并同意
+          <el-link type="primary" :underline="false">用户协议</el-link>和
+          <el-link type="primary" :underline="false">隐私条款</el-link>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-model="checked"></el-checkbox>
-            我已阅读并同意<el-link type="primary" :underline="false">用户协议</el-link>和<el-link type="primary" :underline="false">隐私条款</el-link>
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" style="width:100%">登录</el-button>
+          <el-button type="primary" @click="login()" style="width:100%">登录</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -27,8 +28,69 @@
 <script>
 export default {
   data () {
+    // 用来校验手机号
+    const checkMobile = (rule, value, callback) => {
+      // 校验逻辑
+      if (/^1[3-9]\d{9}$/.test(value)) {
+        callback()
+      } else {
+        callback(new Error('手机号格式不对'))
+      }
+    }
+    // 校验验证码
+    var checkCode = (rule, value, callback) => {
+      // 校验逻辑
+      if (/\d{6}$/.test(value)) {
+        callback()
+      } else {
+        callback(new Error('验证码输入错误'))
+      }
+    }
     return {
+      // 表单对应的对象
+      loginForm: {
+        mobile: '',
+        code: ''
+      },
+      // 表单校验规则对象
+      loginRules: {
+        mobile: [
+          // 具体校验的规则  比如 是否必填 长度  格式
+          { required: true, message: '手机号必填', trigger: 'blur' },
+          { validator: checkMobile, trigger: 'blur' }
+        ],
+        code: [
+          // 验证码必填
+          { required: true, message: '验证码必填', trigger: 'blur' },
+          { validator: checkCode, trigger: 'blur' }
+        ]
+      },
+      // 默认选中复选框
       checked: true
+    }
+  },
+  methods: {
+    login () {
+      // 整体表单的校验
+      this.$refs.loginForm.validate((valid) => {
+        if (valid) {
+          // 如果校验成功 进行登陆
+          this.$http.post('http://ttapi.research.itcast.cn/mp/v1_0/authorizations', this.loginForm)
+            .then(res => {
+              // res 是响应对象 包含响应数据
+              const data = res.data
+              // 后台的返回的json内容 已经转换成对象
+              console.log(data)
+              // 登陆成功后,做什么事情?
+              // 1.跳转到首页
+              // 2.保存登录状态
+            })
+            .catch(() => {
+              // 提示错误  使用组件
+              this.$message.error('用户名或密码错误')
+            })
+        }
+      })
     }
   }
 }
@@ -56,7 +118,7 @@ export default {
     }
   }
 }
-.el-checkbox{
-    margin-right: 5px;
+.el-checkbox {
+  margin-right: 5px;
 }
 </style>

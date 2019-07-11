@@ -10,6 +10,8 @@ import ElementUI from 'element-ui'
 // 引入样式
 import 'element-ui/lib/theme-chalk/index.css'
 // 在全局范围注册组件(注册element-ui 组件库)
+import axios from 'axios'
+Vue.prototype.$http = axios
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false
