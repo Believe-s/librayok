@@ -84,6 +84,9 @@ export default {
               // 登陆成功后,做什么事情?
               // 1.跳转到首页
               // 2.保存登录状态
+              // 2.1 保存登陆后返回的用户信息  包含token
+              // 2.2 使用 sessionStorage 来储存 关闭浏览器会话失效
+              window.sessionStorage.setItem('libray', JSON.stringify(res.data.data))
               this.$router.push('/')
             })
             .catch(() => {
