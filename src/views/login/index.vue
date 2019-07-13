@@ -78,9 +78,9 @@ export default {
           this.$http.post('http://ttapi.research.itcast.cn/mp/v1_0/authorizations', this.loginForm)
             .then(res => {
               // res 是响应对象 包含响应数据
-              const data = res.data
+              // const data = res.data
               // 后台的返回的json内容 已经转换成对象
-              console.log(data)
+              // console.log(data)
               // 登陆成功后,做什么事情?
               // 1.跳转到首页
               // 2.保存登录状态

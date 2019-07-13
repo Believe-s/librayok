@@ -10,8 +10,17 @@ import ElementUI from 'element-ui'
 // 引入样式
 import 'element-ui/lib/theme-chalk/index.css'
 // 在全局范围注册组件(注册element-ui 组件库)
-import axios from 'axios'
+
+import axios from '@/api/axios'
+// // 基准路径
+// axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0/'
+// // 请求头
+// axios.defaults.headers = {
+//   // token 认证需要的字段 值:注意需要加上前缀 Bearer后面加上一个空格
+//   Authorization: 'Bearer ' + JSON.parse(window.sessionStorage.getItem('libray')).token
+// }
 Vue.prototype.$http = axios
+
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false
