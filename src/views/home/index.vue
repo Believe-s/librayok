@@ -4,7 +4,7 @@
       <div class="logo" :class="{close:collapse}"></div>
       <!-- close:collapse 折叠 -->
       <el-menu
-        default-active="/"
+        :default-active="$route.path"
         background-color="#002033"
         text-color="#fff"
         active-text-color="#ffd04b"
@@ -54,15 +54,15 @@
               style="vertical-align:middle"
               width="30"
               height="30"
-              src="../../assets/images/avatar.jpg"
+              :src="avatar"
               alt
             />
-            <b style="vertical-align:middle;padding-left:5px">黑马小哥</b>
+            <b style="vertical-align:middle;padding-left:5px">{{name}}</b>
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item icon="el-icon-setting">个人设置</el-dropdown-item>
-            <el-dropdown-item icon="el-icon-unlock">退出登录</el-dropdown-item>
+            <el-dropdown-item icon="el-icon-setting" @click.native="setting()">个人设置</el-dropdown-item>
+            <el-dropdown-item icon="el-icon-unlock" @click.native="logout()">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </el-header>
@@ -78,12 +78,31 @@
 export default {
   data () {
     return {
-      collapse: false
+      collapse: false,
+      name: '',
+      avatar: ''
     }
+  },
+  created () {
+    const user = JSON.parse(window.sessionStorage.getItem('libray'))
+    this.name = user.name
+    this.avatar = user.photo
   },
   methods: {
     toggleMenu () {
       this.collapse = !this.collapse
+    },
+    // click 事件是给 el-dropdown-item 组件绑定的
+    // 它不是原生的dom,不一定支持原生的事件绑定
+    // 如果我想给组建绑定原生的事件 需要给组建解析后的原生标签绑定
+    // 使用一个事件修饰符 例子:@click.prevent 阻止默认行为 @click.native触发原生事件
+    setting () {
+      this.$router.push('/setting')
+    },
+    logout () {
+      window.sessionStorage.setItem('libray', null) // 设置
+      window.sessionStorage.removeItem('libray') // 删除
+      this.$router.push('/login')
     }
   }
 }
