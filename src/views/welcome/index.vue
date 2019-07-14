@@ -6,9 +6,6 @@
 
 <script>
 export default {
-  created () {
-    this.$http.get('articles').then(res => console.log(res.data)).catch(r => console.log(r))
-  }
 }
 </script>
 
