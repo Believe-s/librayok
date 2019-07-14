@@ -44,12 +44,19 @@
       </el-form>
     </el-card>
     <!-- 结果容器 -->
-    <el-card></el-card>
+    <el-card>
+        <my-test>
+            <template slot="con" slot-scope="scope">内容3{{scope.test}}</template>
+            <template slot="com"></template>
+        </my-test>
+    </el-card>
   </div>
 </template>
 
 <script>
+import MyTest from '@/components/my-test.vue'
 export default {
+  components: { MyTest },
   data () {
     return {
       // 提交给后台的筛选条件
