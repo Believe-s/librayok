@@ -19,6 +19,8 @@ import axios from '@/api/axios'
 //   // token 认证需要的字段 值:注意需要加上前缀 Bearer后面加上一个空格
 //   Authorization: 'Bearer ' + JSON.parse(window.sessionStorage.getItem('libray')).token
 // }
+import comments from '@/components'
+Vue.use(comments)
 Vue.prototype.$http = axios
 
 Vue.use(ElementUI)
