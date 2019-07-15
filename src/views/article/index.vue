@@ -1,5 +1,7 @@
 <template>
   <div class="article-container">
+    <my-channel @input="fn"></my-channel>
+    {{testData}}
     <!-- 筛选容器 -->
     <el-card>
       <div slot="header">
@@ -99,6 +101,7 @@ export default {
   // components: { MyBread },
   data () {
     return {
+      testData: '',
       // 提交给后台的筛选条件
       // 数据为null,不传字段
       reqParams: {
@@ -126,6 +129,10 @@ export default {
     this.getArticles()
   },
   methods: {
+    fn (data) {
+      console.log('fn')
+      this.testData = data
+    },
     // 编辑
     edit (id) {
       // this.$router.push('/publish?id=' + id) 两种写法
