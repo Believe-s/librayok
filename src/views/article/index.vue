@@ -71,7 +71,7 @@
         <el-table-column label="发布时间" prop="pubdate"></el-table-column>
         <el-table-column label="操作" width="120px">
           <template slot-scope="scope">
-            <el-button icon="el-icon-edit" plain circle type="primary"></el-button>
+            <el-button icon="el-icon-edit" plain circle type="primary" @click="edit(scope.row.id)"></el-button>
             <el-button icon="el-icon-delete" plain circle type="danger" @click="del(scope.row.id)"></el-button>
           </template>
         </el-table-column>
@@ -126,6 +126,12 @@ export default {
     this.getArticles()
   },
   methods: {
+    // 编辑
+    edit (id) {
+      // this.$router.push('/publish?id=' + id) 两种写法
+      this.$router.push({ path: '/pbulish', query: { id } })
+    },
+    // 删除
     del (id) {
       // 确认框
       this.$confirm('此操作将永久删除该文章, 是否继续?', '提示', {
