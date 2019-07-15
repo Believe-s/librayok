@@ -3,7 +3,7 @@
     <!-- 筛选容器 -->
     <el-card>
       <div slot="header">
-          <my-bread>内容管理</my-bread>
+        <my-bread>内容管理</my-bread>
       </div>
       <!-- 筛选容器内容 -->
       <el-form :model="reqParams" size="small" label-width="80px">
@@ -28,6 +28,8 @@
         </el-form-item>
         <el-form-item label="时间:">
           <el-date-picker
+            value-format="yyyy-MM-dd"
+            @change="changeDate"
             v-model="dateValues"
             type="daterange"
             range-separator="至"
@@ -36,19 +38,59 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary">筛选</el-button>
+          <el-button type="primary" @click="search()">筛选</el-button>
         </el-form-item>
       </el-form>
     </el-card>
     <!-- 结果容器 -->
     <el-card>
-
+      <div slot="header">
+        根据筛选条件共查询到
+        <b>{{total}}</b>条结果:
+      </div>
+      <el-table :data="articles">
+        <el-table-column label="封面">
+          <template slot-scope="scope">
+            <el-image lazy :src="scope.row.cover.images[0]" style="width:100px;height:75px;">
+              <div slot="error" class="image-slot">
+                <img src="../../assets/images/error.gif" width="100" height="75" alt="">
+              </div>
+            </el-image>
+          </template>
+        </el-table-column>
+        <el-table-column label="标题" prop="title"></el-table-column>
+        <el-table-column label="状态" prop="status">
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.status===0" type="info">草稿</el-tag>
+            <el-tag v-if="scope.row.status===1">待审核</el-tag>
+            <el-tag v-if="scope.row.status===2" type="success">审核通过</el-tag>
+            <el-tag v-if="scope.row.status===3" type="warning">审核失败</el-tag>
+            <el-tag v-if="scope.row.status===4" type="danger">已删除</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="发布时间" prop="pubdate"></el-table-column>
+        <el-table-column label="操作" width="120px">
+          <template slot-scope="scope">
+            <el-button icon="el-icon-edit" plain circle type="primary"></el-button>
+            <el-button icon="el-icon-delete" plain circle type="danger" @click="del(scope.row.id)"></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="box">
+      <el-pagination
+        background layout="prev, pager, next"
+        @current-change="changePager"
+        :current-page="reqParams.page"
+        :page-size="reqParams.per_page"
+        :total="total">
+      </el-pagination>
+      </div>
     </el-card>
   </div>
-   <!-- <my-test>
+  <!-- <my-test>
             <template slot="con" slot-scope="scope">内容3{{scope.test}}</template>
             <template slot="com"></template>
-        </my-test> -->
+  </my-test>-->
 </template>
 
 <script>
@@ -60,14 +102,59 @@ export default {
       // 提交给后台的筛选条件
       // 数据为null,不传字段
       reqParams: {
+        page: 1,
+        per_page: 20,
         status: null,
         channel_id: null,
         begin_pubdate: null,
         end_pubdate: null
       },
       // 频道数据
-      channelOptions: [{ name: 'jj', id: 1 }],
-      dateValues: []
+      channelOptions: [],
+      // 日期控件数据
+      dateValues: [],
+      // 文章列表
+      articles: [],
+      // 数据总条数
+      total: 0
+    }
+  },
+  created () {
+    // 获取频道数据
+    this.getChannelOptions()
+    // 获取列表数据
+    this.getArticles()
+  },
+  methods: {
+    changePager (newPage) {
+      // 当前点击的按钮的页码
+      // 更新提交给后台的参数
+      this.reqParams.page = newPage
+      // 重新获取列表数据
+      this.getArticles()
+    },
+    search () {
+      this.reqParams.page = 1
+      this.getArticles()
+    },
+    changeDate (values) {
+      // 给beginend赋值
+      this.reqParams.begin_pubdate = values[0]
+      this.reqParams.end_pubdate = values[1]
+    },
+    async getChannelOptions () {
+      // { data:{}}
+      const {
+        data: { data }
+      } = await this.$http.get('channels')
+      this.channelOptions = data.channels
+    },
+    async getArticles () {
+      // post 传参 axios.post ('url',{参数对象})
+      // get 传参 axios.get ('url',{params:{参数对象}})
+      const { data: { data } } = await this.$http.get('articles', { params: this.reqParams })
+      this.articles = data.results
+      this.total = data.total_count
     }
   }
 }
@@ -77,5 +164,9 @@ export default {
 // 注意,el-card是组件,解析后标签的类名是el-card
 .el-card {
   margin-bottom: 20px;
+}
+.box{
+  margin-top: 20px;
+  text-align: center;
 }
 </style>
