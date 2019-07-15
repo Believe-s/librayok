@@ -126,6 +126,23 @@ export default {
     this.getArticles()
   },
   methods: {
+    del (id) {
+      // 确认框
+      this.$confirm('此操作将永久删除该文章, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        // 点击确认 发删除请求
+        // 后台没有任何响应 我们会一直等待响应,导致后面的代码无法执行
+        await this.$http.delete(`articles/${id}`)
+        // 删除后做什么?
+        this.getArticles()
+        this.$message.success('删除成功')
+      }).catch(() => {
+        // 点击取消
+      })
+    },
     changePager (newPage) {
       // 当前点击的按钮的页码
       // 更新提交给后台的参数
