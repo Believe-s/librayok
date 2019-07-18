@@ -20,6 +20,10 @@ import axios from '@/api/axios'
 //   Authorization: 'Bearer ' + JSON.parse(window.sessionStorage.getItem('libray')).token
 // }
 import comments from '@/components'
+
+// 引入全局样式
+import '@/styles/index.less'
+
 Vue.use(comments)
 Vue.prototype.$http = axios
 
