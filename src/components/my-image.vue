@@ -18,24 +18,33 @@
             </el-radio-group>
           </div>
           <!-- 图片列表 -->
-          <div class="img-item" v-for="item in images" :key="item.id">
+          <div
+            class="img-item"
+            :class="{selected:selectedImageUrl===item.url}"
+            @click="selected(item.url)"
+            v-for="item in images"
+            :key="item.id"
+          >
             <img :src="item.url" alt />
           </div>
           <!-- 分页区域 -->
           <el-pagination
-          v-if="total>reqParams.per_page"
-          background
-          layout="prev, pager, next"
-          :page-size="reqParams.per_page"
-          :current-page="reqParams.page"
-          @current-change="peger"
-          :total="total"
+            v-if="total>reqParams.per_page"
+            background
+            layout="prev, pager, next"
+            :page-size="reqParams.per_page"
+            :current-page="reqParams.page"
+            @current-change="peger"
+            :total="total"
           ></el-pagination>
         </el-tab-pane>
         <el-tab-pane label="上传图片" name="upload">
           <el-upload
             class="avatar-uploader"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action="http://ttapi.research.itcast.cn/mp/v1_0/user/images"
+            :headers="headers"
+            name="image"
+            :on-success="handleSuccess"
             :show-file-list="false"
           >
             <img v-if="imageUrl" :src="imageUrl" class="avatar" />
@@ -56,6 +65,11 @@ export default {
   name: 'my-image',
   data () {
     return {
+      // 上传图片的头部
+      headers: {
+        Authorization:
+          'Bearer ' + JSON.parse(window.sessionStorage.getItem('libray')).token
+      },
       // 加载中
       loading: false,
       // 这是控制对框显示隐藏
@@ -72,10 +86,16 @@ export default {
       // 上传图片预览的地址
       imageUrl: null,
       // 素材列表
-      images: []
+      images: [],
+      // 选中的图片的id
+      selectedImageUrl: null
     }
   },
   methods: {
+    // 上传成功后预览
+    handleSuccess (res) {
+      this.imageUrl = res.data.url
+    },
     // 打开对话框
     openDialog () {
       this.dialogVisible = true
@@ -85,7 +105,9 @@ export default {
     // 获取列表
     async getImages () {
       this.loading = true
-      const { data: { data } } = await this.$http.get('user/images', { params: this.reqParams })
+      const {
+        data: { data }
+      } = await this.$http.get('user/images', { params: this.reqParams })
       this.images = data.results
       this.total = data.total_count
       this.loading = false
@@ -99,6 +121,12 @@ export default {
     toggleImage () {
       this.reqParams.page = 1
       this.getImages()
+    },
+    // 给当前点击的图片 加上selected
+    // :class="{selected:条件}"
+    // 条件,根据当前图片的url 去匹配遍历的时候 url一致加,不一致不加
+    selected (url) {
+      this.selectedImageUrl = url
     }
   }
 }
@@ -111,6 +139,21 @@ export default {
   border: 1px dashed #ddd;
   display: inline-block;
   margin-right: 10px;
+  position: relative;
+  // &连接符 .image-item.selected交集 .image-item::before()伪类
+  &.selected {
+    &::before {
+      // 一个和图片一样大小的容器 且有半透明的背景 对号图标
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.2) url(../assets/images/selected.png)
+        no-repeat center / 60px 60px;
+    }
+  }
   img {
     width: 100%;
     height: 100%;
