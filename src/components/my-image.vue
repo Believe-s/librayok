@@ -2,7 +2,8 @@
   <div class="image-container">
     <!-- 图片按钮 -->
     <div class="img-btn" @click="openDialog()">
-      <img :src="value" alt />
+      <!-- 父组件有数据 没有使用默认图 -->
+      <img :src="value||defaultImage" alt />
     </div>
     <!-- 对话框 -->
     <el-dialog :visible.sync="dialogVisible" width="700px">
@@ -64,13 +65,15 @@
 import defaultImage from '../assets/images/default.png'
 export default {
   name: 'my-image',
+  props: ['value'],
   data () {
     return {
       // 默认为默认图片
       // 这个位置是否可以使用本地图片地址
       // 项目是webpack打包,如果本地的资源地址,存储在数据中,是不会去打包到你的项目中
       // 主动导入图片资源 此时图片资源就是一项数据(base64的数据)---图片转码为字符串形式输出
-      value: defaultImage,
+      // value: defaultImage,
+      defaultImage,
       // 上传图片的头部
       headers: {
         Authorization:
@@ -103,11 +106,14 @@ export default {
       if (this.activeName === 'image') {
         if (!this.selectedImageUrl) return this.$message.info('请选中封面图')
         // 使用selectedImageUrl
-        this.value = this.selectedImageUrl
+        // this.value = this.selectedImageUrl
+        // 通知父组件数据改变数据
+        this.$emit('input', this.selectedImageUrl)
       } else {
-        // 使用imageUrl
         if (!this.imageUrl) return this.$message.info('请上传封面图')
-        this.value = this.imageUrl
+        // 使用imageUrl
+        // this.value = this.imageUrl
+        this.$emit('input', this.imageUrl)
       }
       this.dialogVisible = false
     },
@@ -118,6 +124,9 @@ export default {
     // 打开对话框
     openDialog () {
       this.dialogVisible = true
+      // 把上一次数据清空
+      this.selectedImageUrl = null
+      this.imageUrl = null
       // 渲染列表
       this.getImages()
     },
@@ -152,6 +161,13 @@ export default {
 </script>
 
 <style scoped lang="less">
+.image-container{
+   width: 150px;
+  height: 120px;
+  margin-right: 20px;
+  display: inline-block;
+  margin-bottom: 20px;
+}
 .img-item {
   width: 150px;
   height: 120px;
