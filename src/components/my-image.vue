@@ -2,7 +2,7 @@
   <div class="image-container">
     <!-- 图片按钮 -->
     <div class="img-btn" @click="openDialog()">
-      <img src="../assets/images/default.png" alt />
+      <img :src="value" alt />
     </div>
     <!-- 对话框 -->
     <el-dialog :visible.sync="dialogVisible" width="700px">
@@ -54,17 +54,23 @@
       </el-tabs>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="confirmImage()">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import defaultImage from '../assets/images/default.png'
 export default {
   name: 'my-image',
   data () {
     return {
+      // 默认为默认图片
+      // 这个位置是否可以使用本地图片地址
+      // 项目是webpack打包,如果本地的资源地址,存储在数据中,是不会去打包到你的项目中
+      // 主动导入图片资源 此时图片资源就是一项数据(base64的数据)---图片转码为字符串形式输出
+      value: defaultImage,
       // 上传图片的头部
       headers: {
         Authorization:
@@ -92,6 +98,19 @@ export default {
     }
   },
   methods: {
+    // confirmImage 确认图片
+    confirmImage () {
+      if (this.activeName === 'image') {
+        if (!this.selectedImageUrl) return this.$message.info('请选中封面图')
+        // 使用selectedImageUrl
+        this.value = this.selectedImageUrl
+      } else {
+        // 使用imageUrl
+        if (!this.imageUrl) return this.$message.info('请上传封面图')
+        this.value = this.imageUrl
+      }
+      this.dialogVisible = false
+    },
     // 上传成功后预览
     handleSuccess (res) {
       this.imageUrl = res.data.url
