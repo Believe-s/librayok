@@ -30,8 +30,12 @@
         <el-form-item label="频道:">
           <my-channel v-model="articleForm.channel_id"></my-channel>
         </el-form-item>
-        <el-form-item>
+        <el-form-item v-if="!articleId">
           <el-button type="primary" @click="publish(false)">发表</el-button>
+          <el-button @click="publish(true)">存入草稿</el-button>
+        </el-form-item>
+        <el-form-item v-else>
+          <el-button type="success" @click="edit(false)">修改</el-button>
           <el-button @click="publish(true)">存入草稿</el-button>
         </el-form-item>
       </el-form>
@@ -77,9 +81,33 @@ export default {
     }
   },
   created () {
+    // 问题:修改的地址过来,点击发布文章 组建不更新
+    // 什么时候执行组件的初始化之后调用
     this.articleId = this.$route.query.id
+    // console.log(this.articleId)
+    // 获取文章数据
+    this.articleId && this.getArticle(this.articleId)
+  },
+  watch: {
+    $route () {
+      this.articleId = this.$route.query.id
+      this.articleForm = {
+        title: '',
+        content: '',
+        cover: {
+          type: 1,
+          // 单图  三图
+          images: []
+        },
+        channel_id: null
+      }
+    }
   },
   methods: {
+    async getArticle (id) {
+      const { data: { data } } = await this.$http.get('articles/' + id)
+      this.articleForm = data
+    },
     changeType () {
       // 重置图片数组
       this.articleForm.cover.images = []
@@ -91,6 +119,11 @@ export default {
       // this.$http(data:请求体,params:query数据地址栏数据)
       await this.$http.post('articles?draft=' + draft, this.articleForm)
       this.$message.success(draft ? '存入草稿成功' : '发表成功')
+      this.$router.push('/article')
+    },
+    async edit (draft) {
+      await this.$http.put(`articles/${this.articleId}?draft=${draft}`, this.articleForm)
+      this.$message.success(draft ? '修改草稿成功' : '修改成功')
       this.$router.push('/article')
     }
   }
