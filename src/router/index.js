@@ -9,6 +9,7 @@ import Article from '@/views/article'
 import Image from '@/views/image'
 import Publish from '@/views/publish'
 import Comment from '@/views/comment'
+import Setting from '@/views/setting'
 Vue.use(VueRouter)
 const router = new VueRouter({
   routes: [
@@ -20,7 +21,8 @@ const router = new VueRouter({
         { path: '/article', name: 'article', component: Article },
         { path: '/image', name: 'image', component: Image },
         { path: '/publish', name: 'publish', component: Publish },
-        { path: '/Comment', name: 'comment', component: Comment }
+        { path: '/Comment', name: 'comment', component: Comment },
+        { path: '/Setting', name: 'setting', component: Setting }
       ] },
     // 路径如果能够走到这个位置,证明没有任何程序去处理这个程序
     { path: '*', name: '404', component: NotFound }
